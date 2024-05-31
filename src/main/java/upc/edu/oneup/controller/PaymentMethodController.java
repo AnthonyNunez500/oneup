@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import upc.edu.oneup.exception.ValidationException;
 import upc.edu.oneup.model.PaymentMethod;
+import upc.edu.oneup.model.User;
+import upc.edu.oneup.repository.UserRepository;
 import upc.edu.oneup.service.PaymentMethodService;
 
 import java.util.List;
@@ -15,10 +17,12 @@ import java.util.List;
 @RequestMapping("/api/oneup/v1") //@RequestMapping("/api/oneup/v1")
 public class PaymentMethodController {
     private final PaymentMethodService paymentMethodService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PaymentMethodController(PaymentMethodService paymentMethodService) {
+    public PaymentMethodController(PaymentMethodService paymentMethodService, UserRepository userRepository) {
         this.paymentMethodService = paymentMethodService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/paymentmethod")
@@ -29,9 +33,11 @@ public class PaymentMethodController {
     public PaymentMethod getPaymentMethod(@PathVariable int id) {
         return paymentMethodService.getPaymentMethodById(id);
     }
-    @PostMapping("/paymentmethod")
+    @PostMapping("/paymentmethod/{user_id}")
     @Transactional
-    public PaymentMethod createPaymentMethod(@RequestBody PaymentMethod paymentMethod) {
+    public PaymentMethod createPaymentMethod(@RequestBody PaymentMethod paymentMethod, @PathVariable int user_id) {
+        User user = userRepository.findById(user_id).get();
+        paymentMethod.setUser(user);
         validatePaymentMethod(paymentMethod);
         return paymentMethodService.savePaymentMethod(paymentMethod);
     }

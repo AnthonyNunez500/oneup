@@ -2,6 +2,7 @@ package upc.edu.oneup.service.impl;
 
 import upc.edu.oneup.model.Device;
 
+import upc.edu.oneup.model.Patient;
 import upc.edu.oneup.repository.DeviceRepository;
 import upc.edu.oneup.service.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +41,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void deleteDevice(int id) {deviceRepository.deleteById(id);}
+
+    @Override
+    public Patient getPatientByDeviceId(int id) {
+        return deviceRepository.findById(id).get().getPatient();
+    }
 
 }

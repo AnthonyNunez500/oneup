@@ -1,5 +1,6 @@
 package upc.edu.oneup.service.impl;
 
+import upc.edu.oneup.model.Device;
 import upc.edu.oneup.model.Patient;
 import upc.edu.oneup.repository.PatientRepository;
 import upc.edu.oneup.service.PatientService;
@@ -34,6 +35,11 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public void deletePatient(int id) {
         patientRepository.deleteById(id);
+    }
+
+    @Override
+    public Device getDeviceByPatientId(int id) {
+        return patientRepository.findById(id).get().getDevice();
     }
 
 

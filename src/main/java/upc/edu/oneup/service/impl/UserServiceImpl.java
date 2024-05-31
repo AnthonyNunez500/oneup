@@ -1,6 +1,7 @@
 package upc.edu.oneup.service.impl;
 
 import upc.edu.oneup.exception.ResourceNotFoundException;
+import upc.edu.oneup.model.Patient;
 import upc.edu.oneup.model.User;
 import upc.edu.oneup.repository.UserRepository;
 import upc.edu.oneup.service.UserService;
@@ -65,6 +66,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsernameAndPassword(username, password);
     }
 
-
-
+    @Override
+    public List<Patient> getPatientsByUserId(int id) {
+        return userRepository.findById(id).get().getPatients();
+    }
 }

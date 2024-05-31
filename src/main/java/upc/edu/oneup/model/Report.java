@@ -1,6 +1,7 @@
 package upc.edu.oneup.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class Report {
     private LocalDateTime time;
 //falta obtener la fecha en ese instante
 
+    @JsonIgnore
     @JsonBackReference
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user", nullable = false)

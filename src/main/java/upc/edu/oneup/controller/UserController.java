@@ -1,6 +1,7 @@
 package upc.edu.oneup.controller;
 
 import upc.edu.oneup.exception.ValidationException;
+import upc.edu.oneup.model.Patient;
 import upc.edu.oneup.model.User;
 import upc.edu.oneup.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,6 +56,12 @@ public class UserController {
     @GetMapping("/users/{id}")
     public User getUserById(@PathVariable int id) {
         return userService.getUserById(id);
+    }
+
+    // Obtiene Los pacientes de un determinado User
+    @GetMapping("/users/{id}/patients")
+    public List<Patient> getPatientsByUserId(@PathVariable int id) {
+        return userService.getPatientsByUserId(id);
     }
 
     // Crea el User

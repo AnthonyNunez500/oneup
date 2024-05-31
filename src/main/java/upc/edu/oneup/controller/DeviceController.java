@@ -4,7 +4,9 @@ import upc.edu.oneup.exception.ResourceNotFoundException;
 import upc.edu.oneup.exception.ValidationException;
 import upc.edu.oneup.model.Device;
 
+import upc.edu.oneup.model.Patient;
 import upc.edu.oneup.model.Report;
+import upc.edu.oneup.repository.PatientRepository;
 import upc.edu.oneup.service.DeviceService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +25,13 @@ import java.util.List;
 public class DeviceController {
     private final DeviceService  deviceService;
     private final UserService userService;
+    private final PatientRepository patientRepository;
 
     @Autowired
-    public  DeviceController(DeviceService deviceService, UserService userService) {
+    public  DeviceController(DeviceService deviceService, UserService userService, PatientRepository patientRepository) {
         this.deviceService = deviceService;
         this.userService = userService;
+        this.patientRepository = patientRepository;
     }
 
     // Endpoint: /api/oneup/v1/device
@@ -48,6 +52,21 @@ public class DeviceController {
         return new ResponseEntity<>(deviceService.getDeviceById(id), HttpStatus.OK);
     }
 
+
+    // Endpoint: /api/oneup/v1/device/{id}/patient
+    // Method: GET
+    // Obtiene el patient por el ID de Device
+    @Transactional(readOnly = true)
+    @GetMapping("/devices/{id}/patient")
+    public ResponseEntity<Patient> getPatientByDeviceId(@PathVariable int id) {
+        Patient patient = deviceService.getPatientByDeviceId(id);
+        if (patient != null) {
+            return new ResponseEntity<>(patient, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     // Endpoint: /api/oneup/v1/device/users/{id}
     // Method: GET
     // Obtiene el device por ID de User
@@ -59,12 +78,16 @@ public class DeviceController {
         return new ResponseEntity<>(deviceService.getDeviceById(id), HttpStatus.OK);
     }
 
-    // Endpoint: /api/oneup/v1/device
+    // Endpoint: /api/oneup/v1/device/{patientId}
     // Method: POST
     // Crea el device
     @Transactional
-    @PostMapping("/device")
-    public ResponseEntity<Device> createDevice(@RequestBody Device device) {
+    @PostMapping("/device/{patientId}")
+    public ResponseEntity<Device> createDevice(@RequestBody Device device, @PathVariable int patientId) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ValidationException("Patient not found"));
+        patient.setDevice(device);
+        device.setPatient(patient);
         validateDevice(device);
         return new ResponseEntity<>(deviceService.saveDevice(device), HttpStatus.CREATED);
     }

@@ -1,6 +1,7 @@
 package upc.edu.oneup.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,9 +23,10 @@ public class Device {
     @Column(name = "product_quantity", length = 50)
     private int productQuantity;
 
+    @JsonIgnore
     @JsonBackReference
     @OneToOne
-    @JoinColumn(name = "z", nullable = false)
+    @JoinColumn(name = "id_patient", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Patient patient;
 }

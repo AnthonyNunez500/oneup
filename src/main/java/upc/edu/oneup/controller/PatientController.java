@@ -1,6 +1,7 @@
 package upc.edu.oneup.controller;
 
 import upc.edu.oneup.exception.ValidationException;
+import upc.edu.oneup.model.Device;
 import upc.edu.oneup.model.Patient;
 import upc.edu.oneup.model.User;
 import upc.edu.oneup.repository.UserRepository;
@@ -40,6 +41,17 @@ public class PatientController {
         }
     }
 
+
+    @GetMapping("/patients/{id}/device")
+    public ResponseEntity<Device> getDeviceByPatientId(@PathVariable int id) {
+        Device device = patientService.getDeviceByPatientId(id);
+        if (device != null) {
+            return new ResponseEntity<>(device, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     // Obtiene todos los Patients
     @GetMapping("/patients")
     public ResponseEntity<List<Patient>> getAllPatients() {
@@ -48,14 +60,15 @@ public class PatientController {
     }
 
     // Crea el Patient
-    @PostMapping("/patients")
-    public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
-        User user = userRepository.findById(patient.getUser().getId())
-                                    .orElseThrow(() -> new ValidationException("User not found"));
-        Patient newPatient = patientService.savePatient(patient);
-        newPatient.setUser(user);
-        return new ResponseEntity<>(newPatient, HttpStatus.CREATED);
-    }
+    @PostMapping("/patients/{userId}")
+    public ResponseEntity<Patient> createPatient(@RequestBody Patient patient, @PathVariable int userId) {
+    User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new ValidationException("User not found"));
+    patient.setDevice(null);
+    patient.setUser(user);
+    Patient newPatient = patientService.savePatient(patient);
+    return new ResponseEntity<>(newPatient, HttpStatus.CREATED);
+}
 
     //elimina el patient por ID
     @DeleteMapping("/patients/{id}")

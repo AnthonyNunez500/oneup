@@ -2,8 +2,10 @@ package upc.edu.oneup.controller;
 
 import upc.edu.oneup.exception.ValidationException;
 import upc.edu.oneup.model.Patient;
+import upc.edu.oneup.model.PaymentMethod;
 import upc.edu.oneup.model.Product;
 import upc.edu.oneup.model.User;
+import upc.edu.oneup.repository.PaymentMethodRepository;
 import upc.edu.oneup.repository.UserRepository;
 import upc.edu.oneup.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,12 +26,14 @@ public class ProductController {
     private final ProductService productService;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
 
     @Autowired
-    public ProductController(ProductService productService, UserService userService, UserRepository userRepository) {
+    public ProductController(ProductService productService, UserService userService, UserRepository userRepository, PaymentMethodRepository paymentMethodRepository) {
         this.productService = productService;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.paymentMethodRepository = paymentMethodRepository;
     }
 
     // EndPoint: /api/oneup/v1/products
@@ -54,12 +58,17 @@ public class ProductController {
     // Method: POST
     // Crea el Product
     @Transactional
-    @PostMapping("/products")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+    @PostMapping("/products/{paymentMethodId}")
+    public ResponseEntity<Product> createProduct(@RequestBody Product product, @PathVariable int paymentMethodId) {
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(paymentMethodId)
+                .orElseThrow(() -> new ValidationException("PaymentMethod not found"));
+
+        User user = paymentMethod.getUser();
+
+        product.setUser(user);
+        product.setPaymentMethod(paymentMethod);
+
         Product newProduct = productService.saveProduct(product);
-        User user = userRepository.findById(product.getUser().getId())
-                                    .orElseThrow(() -> new ValidationException("User not found"));
-        newProduct.setUser(user);
         validateProduct(newProduct);
         existsProductByProductName(newProduct);
         return new ResponseEntity<>(newProduct, HttpStatus.CREATED);

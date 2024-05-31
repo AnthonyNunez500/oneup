@@ -1,9 +1,6 @@
 package upc.edu.oneup.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -42,12 +39,14 @@ public class Patient {
     @Size(max = 50)
     private String disease;
 
+    @JsonIgnore
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User user;
 
+    @JsonIgnore
     @JsonManagedReference
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Device device;
