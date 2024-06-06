@@ -112,7 +112,7 @@ public class ProductController {
 
     //valid que no exista un producto con el mismo nombre
     private void existsProductByProductName(Product product) {
-        if (productService.getProductByProductName(product.getProductName()) != null) {
+        if (productService.getProductByProductName(product.getProductName()) == null) {
             throw new ValidationException("Product name already exists");
         }
     }
